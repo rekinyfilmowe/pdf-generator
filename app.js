@@ -11,24 +11,28 @@ app.post('/', async (req, res) => {
 
     try {
         const browser = await puppeteer.launch({
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            headless: true
+            headless: true,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--single-process'
+            ],
+            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath()
         });
 
         const page = await browser.newPage();
-        await page.goto(url, { waitUntil: 'networkidle0' });
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 0 });
 
         const pdfBuffer = await page.pdf({ format: 'A4' });
         await browser.close();
 
-        // zwróć PDF jako BASE64
         const pdfBase64 = pdfBuffer.toString('base64');
-
         res.json({ pdfBase64 });
 
     } catch (error) {
         console.error('Error generating PDF:', error);
-        res.status(500).send('Error generating PDF');
+        res.status(500).send(`Error generating PDF: ${error.message}`);
     }
 });
 
