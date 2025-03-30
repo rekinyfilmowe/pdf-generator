@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: pdf-generator
+    runtime: node
+    buildCommand: |
+      npm install
+      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false npm install puppeteer@19.11.1
+    startCommand: node app.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DISABLE_BUN
+        value: true
