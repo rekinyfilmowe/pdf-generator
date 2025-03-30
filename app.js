@@ -5,7 +5,7 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.post('/', async (req, res) => {
+app.post('/generate-pdf', async (req, res) => {  // <-- tutaj zmiana na "/generate-pdf"
     const { url } = req.body;
     console.log("URL to generate PDF:", url);
 
