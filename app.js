@@ -11,10 +11,10 @@ app.post('/', async (req, res) => {
   console.log("URL to generate PDF:", url);
 
   try {
-    const browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+   const browser = await puppeteer.launch({
+  args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  headless: true
+});
 
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'networkidle0' });
