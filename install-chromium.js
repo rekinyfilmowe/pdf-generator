@@ -1,8 +1,7 @@
-const { execSync } = require('child_process');
+const puppeteer = require('puppeteer');
 
-console.log("Installing Chromium for Puppeteer...");
-
-execSync("npm uninstall puppeteer puppeteer-core", { stdio: 'inherit' });
-execSync("npm install puppeteer@19.11.1 --force", { stdio: 'inherit' });
-
-console.log("Chromium installed successfully.");
+(async () => {
+    console.log('Installing Chromium for Puppeteer...');
+    await puppeteer.createBrowserFetcher().download(puppeteer.defaultBrowserRevision);
+    console.log('Chromium installed successfully.');
+})();
