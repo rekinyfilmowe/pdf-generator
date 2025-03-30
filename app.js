@@ -5,7 +5,7 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.post('/', async (req, res) => {  // <-- tutaj zmiana na "/generate-pdf"
+app.post('/', async (req, res) => {
     const { url } = req.body;
     console.log("URL to generate PDF:", url);
 
@@ -15,10 +15,8 @@ app.post('/', async (req, res) => {  // <-- tutaj zmiana na "/generate-pdf"
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--single-process'
-            ],
-            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath()
+                '--disable-dev-shm-usage'
+            ]
         });
 
         const page = await browser.newPage();
