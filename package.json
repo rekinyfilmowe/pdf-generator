@@ -2,9 +2,11 @@
   "name": "pdf-generator",
   "version": "1.0.0",
   "main": "app.js",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
-    "start": "node app.js",
-    "render-postinstall": "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false npm install puppeteer@19.11.1"
+    "start": "node app.js"
   },
   "dependencies": {
     "express": "^4.18.2",
