@@ -1,12 +1,3 @@
-require("events").EventEmitter.defaultMaxListeners = 50;
-const express = require("express");
-const fetch = require("node-fetch");
-const puppeteer = require("puppeteer");
-const bodyParser = require("body-parser");
-
-const fs = require("fs");
-const path = require("path");
-
 const app = express();
 app.use(bodyParser.json());
 
@@ -27,63 +18,67 @@ app.post("/", async (req, res) => {
     });
 
     const page = await browser.newPage();
-
     
     await page.goto(url, {
-  waitUntil: "networkidle2", // mniej rygorystyczne (nie czeka na całkowite wyciszenie sieci)
-  timeout: 60000             // zwiększony timeout do 60 sekund
-});
+      waitUntil: "networkidle2", // mniej rygorystyczne czekanie
+      timeout: 60000             // zwiększony timeout do 60 sekund
+    });
 
+    // Wczytanie czcionki
     const fontPath = path.join(__dirname, "Sofia Pro Light.otf");
-const fontBuffer = fs.readFileSync(fontPath);
-const fontBase64 = fontBuffer.toString("base64");
+    const fontBuffer = fs.readFileSync(fontPath);
+    const fontBase64 = fontBuffer.toString("base64");
 
-await page.addStyleTag({
-  content: `
-    @font-face {
-      font-family: 'Sofia Pro Light';
-      src: url(data:font/opentype;base64,${fontBase64}) format("opentype");
-      font-weight: normal;
-      font-style: normal;
-    }
+    await page.addStyleTag({
+      content: `
+        @font-face {
+          font-family: 'Sofia Pro Light';
+          src: url(data:font/opentype;base64,${fontBase64}) format("opentype");
+          font-weight: normal;
+          font-style: normal;
+        }
 
-    body, footer {
-      font-family: 'Sofia Pro Light', sans-serif;
-      color: #212121;
-    }
-  `
-});
-const dataGenerowania = new Date();
-const formatowanaData = `${String(dataGenerowania.getDate()).padStart(2, '0')}.${String(dataGenerowania.getMonth() + 1).padStart(2, '0')}.${dataGenerowania.getFullYear()}, ${String(dataGenerowania.getHours()).padStart(2, '0')}:${String(dataGenerowania.getMinutes()).padStart(2, '0')}`;
+        body, footer {
+          font-family: 'Sofia Pro Light', sans-serif;
+          color: #212121;
+        }
+      `
+    });
 
+    // Data generowania dokumentu
+    const dataGenerowania = new Date();
+    const formatowanaData = `${String(dataGenerowania.getDate()).padStart(2, '0')}.${String(dataGenerowania.getMonth() + 1).padStart(2, '0')}.${dataGenerowania.getFullYear()}, ${String(dataGenerowania.getHours()).padStart(2, '0')}:${String(dataGenerowania.getMinutes()).padStart(2, '0')}`;
 
+    // Wczytanie obrazu
+    const imagePath = path.join(__dirname, "rf_fb_tlo.png");
+    const imageBuffer = fs.readFileSync(imagePath);
+    const imageBase64 = imageBuffer.toString("base64");
+
+    // Generowanie PDF
     const pdfBuffer = await page.pdf({
-  format: "A4",
-  margin: {
-    top: "20mm",
-    bottom: "20mm",
-    left: "20mm",
-    right: "20mm"
-  },
-  displayHeaderFooter: true,  // Ważne – żeby stopka i nagłówek się pojawiły
-  printBackground: true,     // Ważne – żeby tło było załadowane
+      format: "A4",
+      margin: {
+        top: "20mm",
+        bottom: "20mm",
+        left: "20mm",
+        right: "20mm"
+      },
+      displayHeaderFooter: true,  // Ważne – żeby stopka i nagłówek się pojawiły
+      printBackground: true,     // Ważne – żeby tło było załadowane
       
-  const imagePath = path.join(__dirname, "rf_fb_tlo.png");
-const imageBuffer = fs.readFileSync(imagePath);
-const imageBase64 = imageBuffer.toString("base64");
+      headerTemplate: `
+        <div style="width:100%; padding:10px 20px; display:flex; justify-content:flex-start; align-items:center;">
+          <img src="data:image/png;base64,${imageBase64}" style="height:30px;" />
+        </div>
+      `,
+      footerTemplate: `
+        <div style="font-size:8px; font-family:'Sofia Pro Light'; width:100%; text-align:center; color:#212121;">
+          Strona <span class="pageNumber"></span> z <span class="totalPages"></span><br/>
+          ${formatowanaData}
+        </div>
+      `
+    });
 
-headerTemplate: `
-  <div style="width:100%; padding:10px 20px; display:flex; justify-content:flex-start; align-items:center;">
-    <img src="data:image/png;base64,${imageBase64}" style="height:30px;" />
-  </div>
-`,
-  footerTemplate: `
-    <div style="font-size:8px; font-family:'Sofia Pro Light'; width:100%; text-align:center; color:#212121;">
-      Strona <span class="pageNumber"></span> z <span class="totalPages"></span><br/>
-      ${formatowanaData}
-    </div>
-  `
-});
     await browser.close();
 
     const pdfBase64 = pdfBuffer.toString("base64");
