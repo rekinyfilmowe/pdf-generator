@@ -65,28 +65,32 @@ app.post("/", async (req, res) => {
 
     // Generowanie PDF
     const pdfBuffer = await page.pdf({
-      format: "A4",
-      margin: {
-        top: "20mm",
-        bottom: "20mm",
-        left: "20mm",
-        right: "20mm"
-      },
-      displayHeaderFooter: true,  // Ważne – żeby stopka i nagłówek się pojawiły
-      printBackground: true,     // Ważne – żeby tło było załadowane
-      
-      headerTemplate: `
-        <div style="width:100%; padding:10px 20px; display:flex; justify-content:flex-start; align-items:center;">
-          <img src="data:image/png;base64,${imageBase64}" style="height:30px;" />
-        </div>
-      `,
-      footerTemplate: `
-        <div style="font-size:8px; font-family:'Sofia Pro Light'; width:100%; text-align:center; color:#212121;">
-          Strona <span class="pageNumber"></span> z <span class="totalPages"></span><br/>
-          ${formatowanaData}
-        </div>
-      `
-    });
+  format: "A4",
+  margin: {
+    top: "20mm",
+    bottom: "20mm",
+    left: "20mm",
+    right: "20mm"
+  },
+  displayHeaderFooter: true,  // Ważne – żeby stopka i nagłówek się pojawiły
+  printBackground: true,     // Ważne – żeby tło było załadowane
+  
+  headerTemplate: `
+    <div style="width:100%; text-align:center; padding:10px 20px;">
+      <img src="data:image/png;base64,${imageBase64}" style="height:30px;" />
+    </div>
+  `,
+  footerTemplate: `
+    <div style="width:100%; display:flex; justify-content:space-between; font-size:8px; font-family:'Sofia Pro Light'; color:#212121; padding:10px 20px;">
+      <span style="float:left;">Identyfikator dokumentu: {{id}}</span>
+      <span style="float:right;">Data wydruku: {{data.wydruku}}</span>
+    </div>
+    <div style="width:100%; text-align:center; font-size:8px; font-family:'Sofia Pro Light'; color:#212121;">
+      str. <span class="pageNumber"></span> / <span class="totalPages"></span>
+    </div>
+  `
+});
+
 
     await browser.close();
 
