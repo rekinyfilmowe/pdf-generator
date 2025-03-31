@@ -69,18 +69,18 @@ const formatowanaData = `${String(dataGenerowania.getDate()).padStart(2, '0')}.$
     left: "20mm",
     right: "20mm"
   },
-  displayHeaderFooter: true,
-  printBackground: true,
+  displayHeaderFooter: true,  // Ważne – żeby stopka i nagłówek się pojawiły
+  printBackground: true,     // Ważne – żeby tło było załadowane
   headerTemplate: `
     <div style="width:100%; padding:10px 20px; display:flex; justify-content:flex-start; align-items:center;">
       <img src="https://static.wixstatic.com/media/3d0792_7877946f9a97400ead5dfe85d3616de0~mv2.png" style="height:30px;" />
     </div>
   `,
   footerTemplate: `
-  <div style="font-size:8px; font-family:'Sofia Pro Light'; width:100%; text-align:center; color:#212121;">
-    Strona <span class="pageNumber"></span> z <span class="totalPages"></span><br/>
-    ${formatowanaData}
-  </div>
+    <div style="font-size:8px; font-family:'Sofia Pro Light'; width:100%; text-align:center; color:#212121;">
+      Strona <span class="pageNumber"></span> z <span class="totalPages"></span><br/>
+      ${formatowanaData}
+    </div>
   `
 });
     await browser.close();
