@@ -53,7 +53,8 @@ app.post("/", async (req, res) => {
     }
   `
     });
-
+await page.waitForTimeout(500);
+    
     // Data generowania dokumentu
     const dataGenerowania = new Date();
     const formatowanaData = `${String(dataGenerowania.getDate()).padStart(2, '0')}.${String(dataGenerowania.getMonth() + 1).padStart(2, '0')}.${dataGenerowania.getFullYear()}, ${String(dataGenerowania.getHours()).padStart(2, '0')}:${String(dataGenerowania.getMinutes()).padStart(2, '0')}`;
