@@ -56,9 +56,9 @@ app.post("/", async (req, res) => {
 await page.waitForTimeout(500);
     
     // Data generowania dokumentu
-    const dataGenerowania = new Date();
-    const formatowanaData = `${String(dataGenerowania.getDate()).padStart(2, '0')}.${String(dataGenerowania.getMonth() + 1).padStart(2, '0')}.${dataGenerowania.getFullYear()}, ${String(dataGenerowania.getHours()).padStart(2, '0')}:${String(dataGenerowania.getMinutes()).padStart(2, '0')}`;
-
+    const { dataWydruku } = req.body;
+const formatowanaData = dataWydruku || "Brak daty";
+    
     // Wczytanie obrazu
     const imagePath = path.join(__dirname, "rf_fb_tlo.png");
     const imageBuffer = fs.readFileSync(imagePath);
@@ -90,7 +90,7 @@ footerTemplate: `
   <div style="font-family: Arial, sans-serif; font-size:6px; color:#212121; padding:0 15mm; width:100%;">
     <div style="width:100%;">
       <span style="float:left;">Identyfikator dokumentu: ${nazwaDokumentu}</span>
-      <span style="float:right;">Data wydruku: ${dataGenerowania}</span>
+      <span style="float:right;">Data wydruku: ${formatowanaData}</span>
     </div>
     <div style="text-align:right; margin-top:5px; clear:both;">
       str. <span class="pageNumber"></span> / <span class="totalPages"></span>
@@ -112,7 +112,8 @@ footerTemplate: `
       body: JSON.stringify({
         nazwaDokumentu,
         idKlientKarta,
-        pdfBase64
+        pdfBase64,
+        dataWydruku
       })
     });
 
