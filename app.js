@@ -1,3 +1,12 @@
+require("events").EventEmitter.defaultMaxListeners = 50;
+const express = require("express");
+const fetch = require("node-fetch");
+const puppeteer = require("puppeteer");
+const bodyParser = require("body-parser");
+
+const fs = require("fs");
+const path = require("path");
+
 const app = express();
 app.use(bodyParser.json());
 
