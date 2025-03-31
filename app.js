@@ -57,7 +57,25 @@ await page.waitForTimeout(500);
     
     // Data generowania dokumentu
     const { dataWydruku } = req.body;
-const formatowanaData = dataWydruku || "Brak daty";
+
+function formatujDate(dataISO) {
+  if (!dataISO) return "Brak daty";
+  const date = new Date(dataISO);
+
+  const pad = (n) => n.toString().padStart(2, "0");
+
+  const dzien = pad(date.getDate());
+  const miesiac = pad(date.getMonth() + 1); // miesiące są od 0
+  const rok = date.getFullYear();
+
+  const godzina = pad(date.getHours());
+  const minuta = pad(date.getMinutes());
+  const sekunda = pad(date.getSeconds());
+
+  return `${dzien}.${miesiac}.${rok}, ${godzina}:${minuta}:${sekunda}`;
+}
+
+const formatowanaData = formatujDate(dataWydruku);
     
     // Wczytanie obrazu
     const imagePath = path.join(__dirname, "rf_fb_tlo.png");
