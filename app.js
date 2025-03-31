@@ -87,10 +87,10 @@ await page.waitForTimeout(500);
   
 
 footerTemplate: `
-  <div style="font-family: Arial, sans-serif; font-size:8px; color:#212121; padding:0 0mm; width:100%;">
+  <div style="font-family: Arial, sans-serif; font-size:6px; color:#212121; padding:0 15mm; width:100%;">
     <div style="width:100%;">
       <span style="float:left;">Identyfikator dokumentu: ${nazwaDokumentu}</span>
-      <span style="float:right;">Data wydruku: ${formatowanaData}</span>
+      <span style="float:right;">Data wydruku: ${dataGenerowania}</span>
     </div>
     <div style="text-align:right; margin-top:5px; clear:both;">
       str. <span class="pageNumber"></span> / <span class="totalPages"></span>
