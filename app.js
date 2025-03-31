@@ -69,7 +69,7 @@ await page.waitForTimeout(500);
   format: "A4",
   margin: {
     top: "30mm",
-    bottom: "10mm",
+    bottom: "20mm",
     left: "15mm",
     right: "15mm"
   },
@@ -87,12 +87,12 @@ await page.waitForTimeout(500);
   
 
 footerTemplate: `
-  <div style="font-family: Arial, sans-serif; font-size:8px; color:#212121; padding:0 15mm; box-sizing:border-box; width:100%;">
-    <div style="display:flex; justify-content:space-between;">
-      <div>Identyfikator dokumentu: ${nazwaDokumentu}</div>
-      <div>Data wydruku: ${formatowanaData}</div>
+  <div style="font-family: Arial, sans-serif; font-size:8px; color:#212121; padding:0 15mm; width:100%;">
+    <div style="width:100%;">
+      <span style="float:left;">Identyfikator dokumentu: ${nazwaDokumentu}</span>
+      <span style="float:right;">Data wydruku: ${formatowanaData}</span>
     </div>
-    <div style="text-align:right; margin-top:2px;">
+    <div style="text-align:right; margin-top:5px; clear:both;">
       str. <span class="pageNumber"></span> / <span class="totalPages"></span>
     </div>
   </div>
