@@ -1,54 +1,55 @@
-const express = require('express');
-const puppeteer = require('puppeteer');
+import express from "express";
+import fetch from "node-fetch";
+import puppeteer from "puppeteer";
+import bodyParser from "body-parser";
+
 const app = express();
-const port = process.env.PORT || 3000;
+app.use(bodyParser.json());
 
-app.use(express.json());
+app.post("/", async (req, res) => {
+  const { url, nazwaDokumentu, idKlientKarta } = req.body;
 
-app.post('/', async (req, res) => {
-    const { url } = req.body;
-    console.log("URL to generate PDF:", url);
+  if (!url || !nazwaDokumentu || !idKlientKarta) {
+    return res.status(400).json({ error: "Missing required fields." });
+  }
 
-    try {
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage'
-            ]
-        });
+  // 🟢 Odpowiedź natychmiast do Wix (unika 504!)
+  res.status(200).json({ status: "started" });
 
-        const page = await browser.newPage();
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 0 });
+  try {
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"]
+    });
 
-        const pdfBuffer = await page.pdf({
-  format: 'A4',
-  printBackground: true,
-  margin: {
-    top: "30mm",
-    bottom: "30mm",
-    left: "20mm",
-    right: "20mm"
-  },
-  displayHeaderFooter: true,
-  headerTemplate: `<div style="font-size:10px; color: transparent;">.</div>`, // pusty nagłówek
-  footerTemplate: `
-    <div style="width:100%; font-size:10px; text-align:center; color: #999;">
-      Strona <span class="pageNumber"></span> z <span class="totalPages"></span>
-    </div>`
-});
-        await browser.close();
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: "networkidle0" });
 
-        const pdfBase64 = pdfBuffer.toString('base64');
-        res.json({ pdfBase64 });
+    const pdfBuffer = await page.pdf({ format: "A4" });
+    await browser.close();
 
-    } catch (error) {
-        console.error('Error generating PDF:', error);
-        res.status(500).send(`Error generating PDF: ${error.message}`);
-    }
+    const pdfBase64 = pdfBuffer.toString("base64");
+
+    // 🔔 Wyślij webhooka do Wix
+    const webhookUrl = "https://twojastrona-wix.com/_functions/pdfWebhook"; // <--- ZMIEŃ na swój prawdziwy adres!
+
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nazwaDokumentu,
+        idKlientKarta,
+        pdfBase64
+      })
+    });
+
+    console.log("Webhook sent to Wix:", await response.text());
+  } catch (err) {
+    console.error("Błąd podczas generowania PDF lub wysyłania webhooka:", err.message);
+  }
 });
 
-app.listen(port, () => {
-    console.log(`PDF Generator działa na porcie ${port}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`PDF Generator działa na porcie ${PORT}`);
 });
