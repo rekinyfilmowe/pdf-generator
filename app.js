@@ -72,9 +72,9 @@ app.post("/", async (req, res) => {
     left: "20mm",
     right: "20mm"
   },
-  displayHeaderFooter: true,  // Ważne – żeby stopka i nagłówek się pojawiły
-  printBackground: true,     // Ważne – żeby tło było załadowane
-  
+  displayHeaderFooter: true,
+  printBackground: true,
+  timeout: 60000,
   headerTemplate: `
     <div style="width:100%; text-align:center; padding:10px 20px;">
       <img src="data:image/png;base64,${imageBase64}" style="height:30px;" />
@@ -82,8 +82,8 @@ app.post("/", async (req, res) => {
   `,
   footerTemplate: `
     <div style="width:100%; display:flex; justify-content:space-between; font-size:8px; font-family:'Sofia Pro Light'; color:#212121; padding:10px 20px;">
-      <span style="float:left;">Identyfikator dokumentu: {{id}}</span>
-      <span style="float:right;">Data wydruku: {{data.wydruku}}</span>
+      <span style="float:left;">Identyfikator dokumentu: ${nazwaDokumentu}</span>
+      <span style="float:right;">Data wydruku: ${formatowanaData}</span>
     </div>
     <div style="width:100%; text-align:center; font-size:8px; font-family:'Sofia Pro Light'; color:#212121;">
       str. <span class="pageNumber"></span> / <span class="totalPages"></span>
