@@ -72,14 +72,18 @@ app.post("/", async (req, res) => {
     left: "20mm",
     right: "20mm"
   },
-  displayHeaderFooter: true,
-  printBackground: true,
+  displayHeaderFooter: true,  // Ważne – żeby stopka i nagłówek się pojawiły
+  printBackground: true,     // Ważne – żeby tło było załadowane
   timeout: 60000,
+
+  // Nagłówek
   headerTemplate: `
-    <div style="width:100%; text-align:center; padding:10px 20px;">
+    <div style="width:100%; text-align:center; padding:10mm 20px 10mm 20px;"> <!-- Zwiększenie odległości (top) -->
       <img src="data:image/png;base64,${imageBase64}" style="height:30px;" />
     </div>
   `,
+
+  // Stopka
   footerTemplate: `
     <div style="width:100%; display:flex; justify-content:space-between; font-size:8px; font-family:'Sofia Pro Light'; color:#212121; padding:10px 20px;">
       <span style="float:left;">Identyfikator dokumentu: ${nazwaDokumentu}</span>
@@ -90,6 +94,7 @@ app.post("/", async (req, res) => {
     </div>
   `
 });
+
 
 
     await browser.close();
