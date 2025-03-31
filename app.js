@@ -67,7 +67,7 @@ app.post("/", async (req, res) => {
     const pdfBuffer = await page.pdf({
   format: "A4",
   margin: {
-    top: "20mm",
+    top: "30mm",
     bottom: "20mm",
     left: "20mm",
     right: "20mm"
@@ -78,20 +78,22 @@ app.post("/", async (req, res) => {
 
   // Nagłówek
   headerTemplate: `
-    <div style="width:100%; text-align:center; padding:10mm 20px 10mm 20px;"> <!-- Zwiększenie odległości (top) -->
-      <img src="data:image/png;base64,${imageBase64}" style="height:30px;" />
-    </div>
+    <div style="width:100%; text-align:center;">
+    <img src="data:image/png;base64,${imageBase64}" style="height:30px; margin-top:10px;" />
+  </div>
   `,
 
   // Stopka
   footerTemplate: `
-    <div style="width:100%; display:flex; justify-content:space-between; font-size:8px; font-family:'Sofia Pro Light'; color:#212121; padding:10px 20px;">
-      <span style="float:left;">Identyfikator dokumentu: ${nazwaDokumentu}</span>
-      <span style="float:right;">Data wydruku: ${formatowanaData}</span>
+    <div style="width:100%; padding:0 20px; font-size:8px; color:#212121; font-family:'Sofia Pro Light', sans-serif;">
+    <div style="display:flex; justify-content:space-between;">
+      <span>Identyfikator dokumentu: ${nazwaDokumentu}</span>
+      <span>Data wydruku: ${formatowanaData}</span>
     </div>
-    <div style="width:100%; text-align:center; font-size:8px; font-family:'Sofia Pro Light'; color:#212121;">
+    <div style="text-align:center;">
       str. <span class="pageNumber"></span> / <span class="totalPages"></span>
     </div>
+  </div>
   `
 });
 
