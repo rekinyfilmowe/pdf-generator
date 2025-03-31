@@ -105,12 +105,12 @@ const formatowanaData = formatujDate(dataWydruku);
   
 
 footerTemplate: `
-  <div style="font-family: Arial, sans-serif; font-size:6px; color:#212121; width:100%;">
-    <div style="width:100%;">
-      <span style="float:left;">Identyfikator dokumentu: ${nazwaDokumentu}</span>
-      <span style="float:right;">Data wydruku: ${formatowanaData}</span>
+  <div style="font-family: Arial, sans-serif; font-size:6px; color:#212121; width: calc(100% - 30mm); margin: 0 auto;">
+    <div style="display:flex; justify-content:space-between;">
+      <span>Identyfikator dokumentu: ${nazwaDokumentu}</span>
+      <span>Data wydruku: ${formatowanaData}</span>
     </div>
-    <div style="text-align:right; margin-top:5px; clear:both;">
+    <div style="text-align:right; margin-top:5px;">
       str. <span class="pageNumber"></span> / <span class="totalPages"></span>
     </div>
   </div>
