@@ -40,17 +40,17 @@ app.post("/", async (req, res) => {
 
     await page.addStyleTag({
       content: `
-        @font-face {
-          font-family: 'Sofia Pro Light';
-          src: url(data:font/opentype;base64,${fontBase64}) format("opentype");
-          font-weight: normal;
-          font-style: normal;
-        }
+    @font-face {
+      font-family: 'Sofia Pro Light';
+      src: url(data:font/opentype;base64,${fontBase64}) format("opentype");
+      font-weight: normal;
+      font-style: normal;
+    }
 
-        body, footer {
-          font-family: 'Sofia Pro Light', sans-serif;
-          color: #212121;
-        }
+    body, footer {
+      font-family: 'Sofia Pro Light', sans-serif;
+      color: #212121;
+    }
       `
     });
 
@@ -85,15 +85,15 @@ app.post("/", async (req, res) => {
 
   // Stopka
   footerTemplate: `
-    <div style="width:100%; padding:0 20px; font-size:8px; color:#212121; font-family:'Sofia Pro Light', sans-serif;">
-    <div style="display:flex; justify-content:space-between;">
-      <span>Identyfikator dokumentu: ${nazwaDokumentu}</span>
-      <span>Data wydruku: ${formatowanaData}</span>
+    <div style="width:100%; font-size:8px; color:#212121; padding:0 20px; font-family: 'Sofia Pro Light', sans-serif;">
+      <div style="display: flex; justify-content: space-between;">
+        <div>Identyfikator dokumentu: ${nazwaDokumentu}</div>
+        <div>Data wydruku: ${formatowanaData}</div>
+      </div>
+      <div style="text-align: right; margin-top: 2px;">
+        str. <span class="pageNumber"></span> / <span class="totalPages"></span>
+      </div>
     </div>
-    <div style="text-align:center;">
-      str. <span class="pageNumber"></span> / <span class="totalPages"></span>
-    </div>
-  </div>
   `
 });
 
