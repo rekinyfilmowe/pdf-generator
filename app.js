@@ -1,7 +1,7 @@
-import express from "express";
-import fetch from "node-fetch";
-import puppeteer from "puppeteer";
-import bodyParser from "body-parser";
+const express = require("express");
+const fetch = require("node-fetch");
+const puppeteer = require("puppeteer");
+const bodyParser = require("body-parser");
 
 const app = express();
 app.use(bodyParser.json());
