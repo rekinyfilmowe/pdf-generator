@@ -1,3 +1,4 @@
+require("events").EventEmitter.defaultMaxListeners = 50;
 const express = require("express");
 const fetch = require("node-fetch");
 const puppeteer = require("puppeteer");
@@ -23,7 +24,11 @@ app.post("/", async (req, res) => {
     });
 
     const page = await browser.newPage();
-    await page.goto(url, { waitUntil: "networkidle0" });
+    await page.goto(url, {
+  waitUntil: "networkidle2", // mniej rygorystyczne (nie czeka na całkowite wyciszenie sieci)
+  timeout: 60000             // zwiększony timeout do 60 sekund
+});
+
 
     const pdfBuffer = await page.pdf({ format: "A4" });
     await browser.close();
