@@ -31,7 +31,7 @@ app.post("/", async (req, res) => {
     const pdfBase64 = pdfBuffer.toString("base64");
 
     // 🔔 Wyślij webhooka do Wix
-    const webhookUrl = "https://twojastrona-wix.com/_functions/pdfWebhook"; // <--- ZMIEŃ na swój prawdziwy adres!
+    const webhookUrl = "https://www.rekinyfilmowe.pl/_functions/pdfWebhook";
 
     const response = await fetch(webhookUrl, {
       method: "POST",
