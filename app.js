@@ -85,7 +85,7 @@ await page.waitForTimeout(500);
   `,
 
   
-});
+
 footerTemplate: `
   <div style="font-family: Arial, sans-serif; font-size:8px; color:#212121; padding:0 15mm; box-sizing:border-box; width:100%;">
     <div style="display:flex; justify-content:space-between;">
@@ -97,7 +97,7 @@ footerTemplate: `
     </div>
   </div>
 `
-
+});
 
     await browser.close();
 
