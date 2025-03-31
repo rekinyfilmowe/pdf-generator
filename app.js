@@ -85,37 +85,12 @@ app.post("/", async (req, res) => {
 
   // Stopka
   footerTemplate: `
-  <style>
-    @font-face {
-      font-family: 'Sofia Pro Light';
-      src: url(data:font/opentype;base64,${fontBase64}) format("opentype");
-      font-weight: normal;
-      font-style: normal;
-    }
-    .footer {
-      font-family: 'Sofia Pro Light', sans-serif;
-      font-size: 8px;
-      color: #212121;
-      width: 100%;
-      box-sizing: border-box;
-      padding: 0 20mm;
-    }
-    .footer-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .footer-page {
-      text-align: right;
-      margin-top: 2px;
-    }
-  </style>
-  <div class="footer">
-    <div class="footer-row">
+  <div style="font-family:'Sofia Pro Light', sans-serif; font-size:8px; color:#212121; width:100%; box-sizing:border-box; padding:0 20mm;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
       <div>Identyfikator dokumentu: ${nazwaDokumentu}</div>
       <div>Data wydruku: ${formatowanaData}</div>
     </div>
-    <div class="footer-page">
+    <div style="text-align:right; margin-top:2px;">
       str. <span class="pageNumber"></span> / <span class="totalPages"></span>
     </div>
   </div>
