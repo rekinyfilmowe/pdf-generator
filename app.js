@@ -47,11 +47,11 @@ app.post("/", async (req, res) => {
       font-style: normal;
     }
 
-    body, footer {
+    body {
       font-family: 'Sofia Pro Light', sans-serif;
       color: #212121;
     }
-      `
+  `
     });
 
     // Data generowania dokumentu
@@ -85,15 +85,15 @@ app.post("/", async (req, res) => {
 
   // Stopka
   footerTemplate: `
-    <div style="width:100%; font-size:8px; color:#212121; padding:0 20px; font-family: 'Sofia Pro Light', sans-serif;">
-      <div style="display: flex; justify-content: space-between;">
-        <div>Identyfikator dokumentu: ${nazwaDokumentu}</div>
-        <div>Data wydruku: ${formatowanaData}</div>
-      </div>
-      <div style="text-align: right; margin-top: 2px;">
-        str. <span class="pageNumber"></span> / <span class="totalPages"></span>
-      </div>
+    <div style="width:100%; box-sizing:border-box; padding:0 20mm; font-size:8px; color:#212121; font-family: 'Sofia Pro Light', sans-serif;">
+    <div style="display: flex; justify-content: space-between;">
+      <div>Identyfikator dokumentu: ${nazwaDokumentu}</div>
+      <div>Data wydruku: ${formatowanaData}</div>
     </div>
+    <div style="text-align: right; margin-top: 2px;">
+      str. <span class="pageNumber"></span> / <span class="totalPages"></span>
+    </div>
+  </div>
   `
 });
 
