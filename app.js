@@ -47,13 +47,9 @@ await page.addStyleTag({
       font-style: normal;
     }
 
-    body {
+    body, footer {
       font-family: 'Sofia Pro Light', sans-serif;
       color: #212121;
-    }
-
-    * {
-      color: #212121 !important;
     }
   `
 });
@@ -71,11 +67,16 @@ const formatowanaData = `${String(dataGenerowania.getDate()).padStart(2, '0')}.$
   },
   displayHeaderFooter: true,  // Ważne – żeby stopka i nagłówek się pojawiły
   printBackground: true,     // Ważne – żeby tło było załadowane
-  headerTemplate: `
-    <div style="width:100%; padding:10px 20px; display:flex; justify-content:flex-start; align-items:center;">
-      <img src="https://static.wixstatic.com/media/3d0792_7877946f9a97400ead5dfe85d3616de0~mv2.png" style="height:30px;" />
-    </div>
-  `,
+      
+  const imagePath = path.join(__dirname, "rf_fb_tlo.png");
+const imageBuffer = fs.readFileSync(imagePath);
+const imageBase64 = imageBuffer.toString("base64");
+
+headerTemplate: `
+  <div style="width:100%; padding:10px 20px; display:flex; justify-content:flex-start; align-items:center;">
+    <img src="data:image/png;base64,${imageBase64}" style="height:30px;" />
+  </div>
+`,
   footerTemplate: `
     <div style="font-size:8px; font-family:'Sofia Pro Light'; width:100%; text-align:center; color:#212121;">
       Strona <span class="pageNumber"></span> z <span class="totalPages"></span><br/>
