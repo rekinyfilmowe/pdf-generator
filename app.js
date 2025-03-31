@@ -86,7 +86,17 @@ await page.waitForTimeout(500);
 
   
 });
-
+footerTemplate: `
+  <div style="font-family:'Sofia Pro Light', sans-serif; font-size:8px; color:#212121; padding:0 20mm; box-sizing:border-box; width:100%;">
+    <div style="display:flex; justify-content:space-between;">
+      <div>Identyfikator dokumentu: ${nazwaDokumentu}</div>
+      <div>Data wydruku: ${formatowanaData}</div>
+    </div>
+    <div style="text-align:right; margin-top:2px;">
+      str. <span class="pageNumber"></span> / <span class="totalPages"></span>
+    </div>
+  </div>
+`
 
 
     await browser.close();
