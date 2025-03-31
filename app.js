@@ -69,9 +69,9 @@ await page.waitForTimeout(500);
   format: "A4",
   margin: {
     top: "30mm",
-    bottom: "20mm",
-    left: "20mm",
-    right: "20mm"
+    bottom: "10mm",
+    left: "15mm",
+    right: "15mm"
   },
   displayHeaderFooter: true,  // Ważne – żeby stopka i nagłówek się pojawiły
   printBackground: true,     // Ważne – żeby tło było załadowane
@@ -84,18 +84,7 @@ await page.waitForTimeout(500);
   </div>
   `,
 
-  // Stopka
-  footerTemplate: `
-  <div style="font-family:'Sofia Pro Light', sans-serif; font-size:8px; color:#212121; width:100%; box-sizing:border-box; padding:0 20mm;">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <div>Identyfikator dokumentu: ${nazwaDokumentu}</div>
-      <div>Data wydruku: ${formatowanaData}</div>
-    </div>
-    <div style="text-align:right; margin-top:2px;">
-      str. <span class="pageNumber"></span> / <span class="totalPages"></span>
-    </div>
-  </div>
-`
+  
 });
 
 
