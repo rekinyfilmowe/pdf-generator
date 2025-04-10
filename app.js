@@ -97,10 +97,10 @@ const formatowanaData = formatujDate(dataWydruku);
 
   // Nagłówek
   headerTemplate: `
-    <div style="width:100%; text-align:center;">
-    <img src="data:image/png;base64,${imageBase64}" style="height:30px; margin-top:10px;" />
+  <div style="font-size:8px; text-align:center; width:100%; margin-top:10px;">
+    Rekiny Filmowe – Umowa
   </div>
-  `,
+`,
 
   
 
