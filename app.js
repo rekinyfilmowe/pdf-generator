@@ -74,7 +74,9 @@ const formatowanaData = formatujDate(dataWydruku);
   printBackground: true,     // Ważne – żeby tło było załadowane
   timeout: 60000,
 
-      headerTemplate: "", 
+      headerTemplate: `
+  <div style="height:0; display:none;"></div>
+`,
       
 footerTemplate: `
   <div style="font-family: Arial, sans-serif; font-size:6px; color:#212121; width: calc(100% - 30mm); margin: 0 auto;">
