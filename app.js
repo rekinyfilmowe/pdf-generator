@@ -33,26 +33,8 @@ app.post("/", async (req, res) => {
       timeout: 60000             // zwiększony timeout do 60 sekund
     });
 
-    // Wczytanie czcionki
-    const fontPath = path.join(__dirname, "Sofia Pro Light.otf");
-    const fontBuffer = fs.readFileSync(fontPath);
-    const fontBase64 = fontBuffer.toString("base64");
+    
 
-    await page.addStyleTag({
-      content: `
-    @font-face {
-      font-family: 'Sofia Pro Light';
-      src: url(data:font/opentype;base64,${fontBase64}) format("opentype");
-      font-weight: normal;
-      font-style: normal;
-    }
-
-    body {
-      font-family: 'Sofia Pro Light', sans-serif;
-      color: #212121;
-    }
-  `
-    });
 await page.waitForTimeout(500);
     
     // Data generowania dokumentu
@@ -77,10 +59,7 @@ function formatujDate(dataISO) {
 
 const formatowanaData = formatujDate(dataWydruku);
     
-    // Wczytanie obrazu
-    const imagePath = path.join(__dirname, "rf_fb_tlo.png");
-    const imageBuffer = fs.readFileSync(imagePath);
-    const imageBase64 = imageBuffer.toString("base64");
+    
 
     // Generowanie PDF
     const pdfBuffer = await page.pdf({
