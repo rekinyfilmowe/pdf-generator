@@ -86,7 +86,7 @@ const formatowanaData = formatujDate(dataWydruku);
     const pdfBuffer = await page.pdf({
   format: "A4",
   margin: {
-    top: "30mm",
+    top: "20mm",
     bottom: "20mm",
     left: "15mm",
     right: "15mm"
@@ -95,15 +95,8 @@ const formatowanaData = formatujDate(dataWydruku);
   printBackground: true,     // Ważne – żeby tło było załadowane
   timeout: 60000,
 
-  // Nagłówek
-  headerTemplate: `
-  <div style="font-size:8px; text-align:center; width:100%; margin-top:10px;">
-    Rekiny Filmowe – Umowa
-  </div>
-`,
-
-  
-
+      headerTemplate: "", 
+      
 footerTemplate: `
   <div style="font-family: Arial, sans-serif; font-size:6px; color:#212121; width: calc(100% - 30mm); margin: 0 auto;">
     <div style="display:flex; justify-content:space-between;">
