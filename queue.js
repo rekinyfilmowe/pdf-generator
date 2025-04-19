@@ -22,7 +22,7 @@ async function processQueue() {
     reject(err);
   } finally {
     isProcessing = false;
-    setTimeout(processQueue, 0); // rusz z kolejnym
+    setTimeout(processQueue, 0);
   }
 }
 
