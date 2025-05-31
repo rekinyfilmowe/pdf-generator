@@ -10,11 +10,11 @@ const { uploadPdfBufferToBunny } = require("./uploadPdfBufferToBunny");
 const app = express();
 app.use(bodyParser.json());
 
-app.post("/pdfprinter", async (req, res) => {
-  const { url, nazwaDokumentu, idKlientKarta, dataWydruku } = req.body;
+app.post("/pdf", async (req, res) => {
+  const { url, nazwaDokumentu, idKlientKarta } = req.body;
 
   if (!url || !nazwaDokumentu || !idKlientKarta) {
-    return res.status(400).json({ error: "Missing required fields." });
+    return res.status(400).json({ error: "Brakuje wymaganych danych." });
   }
 
   try {
@@ -27,39 +27,39 @@ app.post("/pdfprinter", async (req, res) => {
     await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
     await page.waitForTimeout(500);
 
-    const formatowanaData = new Date(dataWydruku).toLocaleString("pl-PL");
-
     const pdfBuffer = await page.pdf({
       format: "A4",
       margin: { top: "20mm", bottom: "20mm", left: "15mm", right: "15mm" },
-      displayHeaderFooter: true,
-      printBackground: true,
-      timeout: 60000,
-      headerTemplate: `<div></div>`,
-      footerTemplate: `
-        <div style="font-family: Arial; font-size:6px; width:100%; margin:0 auto;">
-          <div style="display:flex; justify-content:space-between;">
-            <span>Identyfikator dokumentu: ${nazwaDokumentu}</span>
-            <span>Data wydruku: ${formatowanaData}</span>
-          </div>
-          <div style="text-align:right;">str. <span class="pageNumber"></span> / <span class="totalPages"></span></div>
-        </div>`
+      printBackground: true
     });
 
     await browser.close();
 
-    const publicznyLink = await uploadPdfBufferToBunny({
-      buffer: pdfBuffer,
-      fileName: nazwaDokumentu,
-      clientId: idKlientKarta
+    // ⬇️ Upload do Bunny
+    const uploadUrl = `https://storage.bunnycdn.com/pliki-uzytkownikow/karty/${idKlientKarta}/pliki/${nazwaDokumentu}.pdf`;
+    const responseUpload = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: {
+        "AccessKey": process.env.BUNNY_API_KEY,
+        "Content-Type": "application/pdf"
+      },
+      body: pdfBuffer
     });
 
-    return res.status(200).json({ url: publicznyLink }); // ✅ TO frontend dostanie
+    if (!responseUpload.ok) {
+      const err = await responseUpload.text();
+      return res.status(500).json({ error: "Upload error: " + err });
+    }
+
+    const publicznyLink = `https://rekiny-filmowe.b-cdn.net/karty/${idKlientKarta}/pliki/${nazwaDokumentu}.pdf`;
+    return res.status(200).json({ publicznyLink });
+
   } catch (err) {
-    console.error("❌ Błąd w /pdfprinter:", err.message);
+    console.error("❌ Błąd generowania/uploadu PDF:", err);
     return res.status(500).json({ error: err.message });
   }
 });
+
 
 
 app.post("/", async (req, res) => {
