@@ -5,6 +5,7 @@ const puppeteer = require("puppeteer");
 const bodyParser = require("body-parser");
 
 const { addToQueue } = require("./queue");
+const { uploadPdfBufferToBunny } = require("./uploadPdfBufferToBunny");
 
 const app = express();
 app.use(bodyParser.json());
@@ -12,9 +13,7 @@ app.use(bodyParser.json());
 app.post("/instant", async (req, res) => {
   const { url } = req.body;
 
-  if (!url) {
-    return res.status(400).json({ error: "Missing URL." });
-  }
+  if (!url) return res.status(400).json({ error: "Missing URL." });
 
   try {
     const browser = await puppeteer.launch({
@@ -42,7 +41,6 @@ app.post("/instant", async (req, res) => {
   }
 });
 
-
 app.post("/", async (req, res) => {
   const { url, nazwaDokumentu, idKlientKarta, dataWydruku } = req.body;
 
@@ -50,10 +48,8 @@ app.post("/", async (req, res) => {
     return res.status(400).json({ error: "Missing required fields." });
   }
 
-  // 🟢 Natychmiastowa odpowiedź do Wix
-  res.status(200).json({ status: "started" });
+  res.status(200).json({ status: "started" }); // ✅ Wix od razu dostaje odpowiedź
 
-  // 🔁 Dodaj do kolejki!
   addToQueue(async () => {
     try {
       const browser = await puppeteer.launch({
@@ -62,12 +58,7 @@ app.post("/", async (req, res) => {
       });
 
       const page = await browser.newPage();
-
-      await page.goto(url, {
-        waitUntil: "networkidle2",
-        timeout: 60000
-      });
-
+      await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
       await page.waitForTimeout(500);
 
       function formatujDate(dataISO) {
@@ -100,18 +91,24 @@ app.post("/", async (req, res) => {
 
       await browser.close();
 
-      const pdfBase64 = pdfBuffer.toString("base64");
+      // ⬇️ Upload PDF do Bunny
+      const publicznyLink = await uploadPdfBufferToBunny({
+        buffer: pdfBuffer,
+        fileName: nazwaDokumentu,
+        clientId: idKlientKarta
+      });
 
+      // ⬇️ Webhook jak wcześniej (opcjonalnie)
       const webhookUrl = "https://www.rekinyfilmowe.pl/_functions/pdfWebhook";
-
       const response = await fetch(webhookUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           nazwaDokumentu,
           idKlientKarta,
-          pdfBase64,
-          dataWydruku
+          pdfBase64: pdfBuffer.toString("base64"),
+          dataWydruku,
+          publicznyLink
         })
       });
 
