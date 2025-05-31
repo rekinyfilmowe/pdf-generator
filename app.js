@@ -9,6 +9,40 @@ const { addToQueue } = require("./queue");
 const app = express();
 app.use(bodyParser.json());
 
+app.post("/instant", async (req, res) => {
+  const { url } = req.body;
+
+  if (!url) {
+    return res.status(400).json({ error: "Missing URL." });
+  }
+
+  try {
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"]
+    });
+
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
+    await page.waitForTimeout(500);
+
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      margin: { top: "20mm", bottom: "20mm", left: "15mm", right: "15mm" },
+      printBackground: true
+    });
+
+    await browser.close();
+
+    const pdfBase64 = pdfBuffer.toString("base64");
+    return res.status(200).json({ pdfBase64 });
+  } catch (err) {
+    console.error("❌ Błąd generowania PDF (instant):", err.message);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+
 app.post("/", async (req, res) => {
   const { url, nazwaDokumentu, idKlientKarta, dataWydruku } = req.body;
 
