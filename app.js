@@ -10,10 +10,12 @@ const { uploadPdfBufferToBunny } = require("./uploadPdfBufferToBunny");
 const app = express();
 app.use(bodyParser.json());
 
-app.post("/instant", async (req, res) => {
-  const { url } = req.body;
+app.post("/pdfprinter", async (req, res) => {
+  const { url, nazwaDokumentu, idKlientKarta, dataWydruku } = req.body;
 
-  if (!url) return res.status(400).json({ error: "Missing URL." });
+  if (!url || !nazwaDokumentu || !idKlientKarta) {
+    return res.status(400).json({ error: "Missing required fields." });
+  }
 
   try {
     const browser = await puppeteer.launch({
@@ -25,21 +27,40 @@ app.post("/instant", async (req, res) => {
     await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
     await page.waitForTimeout(500);
 
+    const formatowanaData = new Date(dataWydruku).toLocaleString("pl-PL");
+
     const pdfBuffer = await page.pdf({
       format: "A4",
       margin: { top: "20mm", bottom: "20mm", left: "15mm", right: "15mm" },
-      printBackground: true
+      displayHeaderFooter: true,
+      printBackground: true,
+      timeout: 60000,
+      headerTemplate: `<div></div>`,
+      footerTemplate: `
+        <div style="font-family: Arial; font-size:6px; width:100%; margin:0 auto;">
+          <div style="display:flex; justify-content:space-between;">
+            <span>Identyfikator dokumentu: ${nazwaDokumentu}</span>
+            <span>Data wydruku: ${formatowanaData}</span>
+          </div>
+          <div style="text-align:right;">str. <span class="pageNumber"></span> / <span class="totalPages"></span></div>
+        </div>`
     });
 
     await browser.close();
 
-    const pdfBase64 = pdfBuffer.toString("base64");
-    return res.status(200).json({ pdfBase64 });
+    const publicznyLink = await uploadPdfBufferToBunny({
+      buffer: pdfBuffer,
+      fileName: nazwaDokumentu,
+      clientId: idKlientKarta
+    });
+
+    return res.status(200).json({ url: publicznyLink }); // ✅ TO frontend dostanie
   } catch (err) {
-    console.error("❌ Błąd generowania PDF (instant):", err.message);
+    console.error("❌ Błąd w /pdfprinter:", err.message);
     return res.status(500).json({ error: err.message });
   }
 });
+
 
 app.post("/", async (req, res) => {
   const { url, nazwaDokumentu, idKlientKarta, dataWydruku } = req.body;
