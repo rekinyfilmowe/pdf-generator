@@ -129,18 +129,35 @@ async function handlePdfGeneration({ url, nazwaDokumentu, idKlientKarta, dataWyd
     const webhookUrl = "https://www.rekinyfilmowe.pl/_functions/pdfWebhook";
     console.log("📤 Wysyłka do webhooka:", { nazwaDokumentu, idKlientKarta, publicznyLink });
 
-    const response = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nazwaDokumentu,
-        idKlientKarta,
-        publicznyLink
-      })
-    });
+    try {
+  const response = await fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      nazwaDokumentu,
+      idKlientKarta,
+      publicznyLink
+    })
+  });
 
-    const responseText = await response.text();
-    console.log("📬 Odpowiedź webhooka:", response.status, responseText);
+  const responseText = await response.text();
+
+  console.log("📤 Webhook wysłany do:", webhookUrl);
+  console.log("📤 Payload:", {
+    nazwaDokumentu,
+    idKlientKarta,
+    publicznyLink
+  });
+  console.log("📬 Webhook status:", response.status);
+  console.log("📬 Webhook response:", responseText);
+
+  if (!response.ok) {
+    console.error("❌ Webhook FAILED:", response.status, responseText);
+  }
+} catch (err) {
+  console.error("❌ Błąd wysyłki webhooka:", err.message);
+}
+
   } catch (err) {
     console.error("❌ Błąd generowania PDF lub webhooka:", err.message);
   }
