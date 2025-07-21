@@ -120,7 +120,7 @@ app.post("/", async (req, res) => {
       });
 
       // ⬇️ Webhook jak wcześniej (opcjonalnie)
-      const webhookUrl = "https://www.rekinyfilmowe.pl/_functions/pdfWebhook";
+      const webhookUrl = "https://www.rekinyfilmowe.pl/_functions/post_pdfWebhook";
       const response = await fetch(webhookUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
