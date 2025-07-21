@@ -62,6 +62,7 @@ app.post("/pdf", async (req, res) => {
 
 
 
+// ROUTE główny
 app.post("/", async (req, res) => {
   const { url, nazwaDokumentu, idKlientKarta, dataWydruku } = req.body;
 
@@ -69,77 +70,81 @@ app.post("/", async (req, res) => {
     return res.status(400).json({ error: "Missing required fields." });
   }
 
-  res.status(200).json({ status: "started" }); // ✅ Wix od razu dostaje odpowiedź
+  res.status(200).json({ status: "started" });
 
-  addToQueue(async () => {
-    try {
-      const browser = await puppeteer.launch({
-        headless: "new",
-        args: ["--no-sandbox", "--disable-setuid-sandbox"]
-      });
+  // 🟩 PRZEKAZANIE DANYCH DO KOLEJKI (ZAKRES OK)
+  addToQueue(() => handlePdfGeneration({ url, nazwaDokumentu, idKlientKarta, dataWydruku }));
+}); // 🛑 KONIEC app.post()
 
-      const page = await browser.newPage();
-      await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
-      await page.waitForTimeout(500);
+  // 🟢 OSOBNA FUNKCJA – JUŻ POZA BLOKIEM
+async function handlePdfGeneration({ url, nazwaDokumentu, idKlientKarta, dataWydruku }) {
+  try {
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"]
+    });
 
-      function formatujDate(dataISO) {
-        if (!dataISO) return "Brak daty";
-        const date = new Date(dataISO);
-        const pad = (n) => n.toString().padStart(2, "0");
-        return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()}, ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-      }
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
+    await page.waitForTimeout(500);
 
-      const formatowanaData = formatujDate(dataWydruku);
-
-      const pdfBuffer = await page.pdf({
-        format: "A4",
-        margin: { top: "20mm", bottom: "20mm", left: "15mm", right: "15mm" },
-        displayHeaderFooter: true,
-        printBackground: true,
-        timeout: 60000,
-        headerTemplate: `<div style="height:0; display:none;"></div>`,
-        footerTemplate: `
-          <div style="font-family: Arial, sans-serif; font-size:6px; color:#212121; width: calc(100% - 30mm); margin: 0 auto;">
-            <div style="display:flex; justify-content:space-between;">
-              <span>Identyfikator dokumentu: ${nazwaDokumentu}</span>
-              <span>Data wydruku: ${formatowanaData}</span>
-            </div>
-            <div style="text-align:right; margin-top:5px;">
-              str. <span class="pageNumber"></span> / <span class="totalPages"></span>
-            </div>
-          </div>`
-      });
-
-      await browser.close();
-
-      // ⬇️ Upload PDF do Bunny
-      const publicznyLink = await uploadPdfBufferToBunny({
-        buffer: pdfBuffer,
-        fileName: nazwaDokumentu,
-        clientId: idKlientKarta
-      });
-
-      console.log("📎 publicznyLink z uploadPdfBufferToBunny:", publicznyLink);
-
-
-      // ⬇️ Webhook jak wcześniej (opcjonalnie)
-      const webhookUrl = "https://www.rekinyfilmowe.pl/_functions/pdfWebhook";
-      const response = await fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nazwaDokumentu,
-          idKlientKarta,
-          publicznyLink
-        })
-      });
-
-      console.log("✅ Webhook wysłany:", await response.text());
-    } catch (err) {
-      console.error("❌ Błąd generowania PDF lub webhooka:", err.message);
+    function formatujDate(dataISO) {
+      if (!dataISO) return "Brak daty";
+      const date = new Date(dataISO);
+      const pad = (n) => n.toString().padStart(2, "0");
+      return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()}, ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
     }
-  });
-});
+
+    const formatowanaData = formatujDate(dataWydruku);
+
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      margin: { top: "20mm", bottom: "20mm", left: "15mm", right: "15mm" },
+      displayHeaderFooter: true,
+      printBackground: true,
+      timeout: 60000,
+      headerTemplate: `<div style="height:0; display:none;"></div>`,
+      footerTemplate: `
+        <div style="font-family: Arial, sans-serif; font-size:6px; color:#212121; width: calc(100% - 30mm); margin: 0 auto;">
+          <div style="display:flex; justify-content:space-between;">
+            <span>Identyfikator dokumentu: ${nazwaDokumentu}</span>
+            <span>Data wydruku: ${formatowanaData}</span>
+          </div>
+          <div style="text-align:right; margin-top:5px;">
+            str. <span class="pageNumber"></span> / <span class="totalPages"></span>
+          </div>
+        </div>`
+    });
+
+    await browser.close();
+
+    const publicznyLink = await uploadPdfBufferToBunny({
+      buffer: pdfBuffer,
+      fileName: nazwaDokumentu,
+      clientId: idKlientKarta
+    });
+
+    console.log("📎 publicznyLink z uploadPdfBufferToBunny:", publicznyLink);
+
+    const webhookUrl = "https://www.rekinyfilmowe.pl/_functions/pdfWebhook";
+    console.log("📤 Wysyłka do webhooka:", { nazwaDokumentu, idKlientKarta, publicznyLink });
+
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nazwaDokumentu,
+        idKlientKarta,
+        publicznyLink
+      })
+    });
+
+    const responseText = await response.text();
+    console.log("📬 Odpowiedź webhooka:", response.status, responseText);
+  } catch (err) {
+    console.error("❌ Błąd generowania PDF lub webhooka:", err.message);
+  }
+}
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
