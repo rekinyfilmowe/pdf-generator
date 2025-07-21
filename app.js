@@ -127,8 +127,6 @@ app.post("/", async (req, res) => {
         body: JSON.stringify({
           nazwaDokumentu,
           idKlientKarta,
-          pdfBase64: pdfBuffer.toString("base64"),
-          dataWydruku,
           publicznyLink
         })
       });
