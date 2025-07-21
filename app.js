@@ -119,6 +119,9 @@ app.post("/", async (req, res) => {
         clientId: idKlientKarta
       });
 
+      console.log("📎 publicznyLink z uploadPdfBufferToBunny:", publicznyLink);
+
+
       // ⬇️ Webhook jak wcześniej (opcjonalnie)
       const webhookUrl = "https://www.rekinyfilmowe.pl/_functions/pdfWebhook";
       const response = await fetch(webhookUrl, {
