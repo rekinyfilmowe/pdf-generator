@@ -73,7 +73,10 @@ app.post("/", async (req, res) => {
   res.status(200).json({ status: "started" });
 
   // 🟩 PRZEKAZANIE DANYCH DO KOLEJKI (ZAKRES OK)
-  addToQueue(() => handlePdfGeneration({ url, nazwaDokumentu, idKlientKarta, dataWydruku }));
+  addToQueue(() => {
+  return handlePdfGeneration({ url, nazwaDokumentu, idKlientKarta, dataWydruku });
+});
+
 }); // 🛑 KONIEC app.post()
 
   // 🟢 OSOBNA FUNKCJA – JUŻ POZA BLOKIEM
