@@ -32,7 +32,16 @@ app.post("/pdf", async (req, res) => {
 
     // 📄 unikalna nazwa pliku
     const safeId = idDokumentu || "brak-id";
-    const fileName = `${nazwaDokumentu}-${safeId}.pdf`;
+    // 🔹 znacznik czasu: 20251007_143012
+const now = new Date();
+const pad = n => String(n).padStart(2, "0");
+const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+
+// 🔹 czysta nazwa bez spacji
+const safeName = nazwaDokumentu.replace(/\s+/g, "_");
+
+// 🔹 finalna nazwa PDF
+const fileName = `${safeName}-${safeId}-${timestamp}.pdf`;
 
     console.log("📄 Generuję PDF:", {
       url,
