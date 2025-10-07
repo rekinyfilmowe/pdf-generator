@@ -11,13 +11,39 @@ const app = express();
 app.use(bodyParser.json());
 
 app.post("/pdf", async (req, res) => {
-  const { url, nazwaDokumentu, idKlientKarta } = req.body;
-
-  if (!url || !nazwaDokumentu || !idKlientKarta) {
-    return res.status(400).json({ error: "Brakuje wymaganych danych." });
-  }
-
   try {
+    const {
+      url,
+      nazwaDokumentu,
+      idKlientKarta,
+      idDokumentu,
+      typDokumentu
+    } = req.body;
+
+    if (!url || !nazwaDokumentu) {
+      return res.status(400).json({ error: "Brakuje wymaganych danych (url, nazwaDokumentu)." });
+    }
+
+    // 📂 wybór folderu (zależnie od kontekstu)
+    const hasCard = idKlientKarta && idKlientKarta !== "brak";
+    const safeFolder = hasCard
+      ? `karty/${idKlientKarta}/pliki`
+      : "dokumenty";
+
+    // 📄 unikalna nazwa pliku
+    const safeId = idDokumentu || "brak-id";
+    const fileName = `${nazwaDokumentu}-${safeId}.pdf`;
+
+    console.log("📄 Generuję PDF:", {
+      url,
+      nazwaDokumentu,
+      typDokumentu,
+      idDokumentu,
+      safeFolder,
+      fileName
+    });
+
+    // 🧭 generowanie PDF
     const browser = await puppeteer.launch({
       headless: "new",
       args: ["--no-sandbox", "--disable-setuid-sandbox"]
@@ -35,12 +61,12 @@ app.post("/pdf", async (req, res) => {
 
     await browser.close();
 
-    // ⬇️ Upload do Bunny
-    const uploadUrl = `https://storage.bunnycdn.com/pliki-uzytkownikow/karty/${idKlientKarta}/pliki/${nazwaDokumentu}.pdf`;
+    // ⬆️ upload do Bunny
+    const uploadUrl = `https://storage.bunnycdn.com/pliki-uzytkownikow/${safeFolder}/${fileName}`;
     const responseUpload = await fetch(uploadUrl, {
       method: "PUT",
       headers: {
-        "AccessKey": process.env.BUNNY_API_KEY,
+        AccessKey: process.env.BUNNY_API_KEY,
         "Content-Type": "application/pdf"
       },
       body: pdfBuffer
@@ -48,17 +74,26 @@ app.post("/pdf", async (req, res) => {
 
     if (!responseUpload.ok) {
       const err = await responseUpload.text();
+      console.error("❌ Upload error:", err);
       return res.status(500).json({ error: "Upload error: " + err });
     }
 
-    const publicznyLink = `https://rekiny-filmowe.b-cdn.net/karty/${idKlientKarta}/pliki/${nazwaDokumentu}.pdf`;
-    return res.status(200).json({ publicznyLink });
+    // 🌍 publiczny link
+    const publicznyLink = `https://rekiny-filmowe.b-cdn.net/${safeFolder}/${fileName}`;
+
+    return res.status(200).json({
+      success: true,
+      publicznyLink,
+      typDokumentu: typDokumentu || "nieokreślony",
+      idDokumentu: safeId
+    });
 
   } catch (err) {
     console.error("❌ Błąd generowania/uploadu PDF:", err);
     return res.status(500).json({ error: err.message });
   }
 });
+
 
 
 
