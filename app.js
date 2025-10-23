@@ -60,7 +60,13 @@ const fileName = `${safeName}-${safeId}-${timestamp}.pdf`;
 
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
-    await page.waitForTimeout(500);
+
+try {
+  await page.waitForFunction("window.__PDF_READY__ === true", { timeout: 20000 });
+  console.log("✅ Strona gotowa – window.__PDF_READY__ = true");
+} catch {
+  console.warn("⚠️ Timeout PDF_READY – generuję mimo to");
+}
 
     const pdfBuffer = await page.pdf({
       format: "A4",
@@ -130,8 +136,14 @@ async function handlePdfGeneration({ url, nazwaDokumentu, idKlientKarta, dataWyd
     });
 
     const page = await browser.newPage();
-    await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
-    await page.waitForTimeout(500);
+   await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
+
+try {
+  await page.waitForFunction("window.__PDF_READY__ === true", { timeout: 20000 });
+  console.log("✅ Strona gotowa – window.__PDF_READY__ = true");
+} catch {
+  console.warn("⚠️ Timeout PDF_READY – generuję mimo to");
+}
 
     function formatujDate(dataISO) {
       if (!dataISO) return "Brak daty";
